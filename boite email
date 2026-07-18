@@ -1,0 +1,280 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        -48
+      ],
+      "id": "0d132a71-0f27-4310-b99f-247258fb146b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vGLbqvrgFBhbBYXk",
+          "name": "bloominfinity"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \t\"objet-du-mail\":\"\",\n    \"contenue-de-email\":\"\",\n    \"adress-email-expediteur\":\"\",\n    \"destinataire\":\"\",\n    \"date-de-reservation\":\"\",\n    \"heure-de-reservation\":\"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        192
+      ],
+      "id": "a2ec225a-f75f-4c7e-ac50-d2f4bf2e8e1f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        176
+      ],
+      "id": "81f1557c-3f9a-4607-a845-b7931b1a369b",
+      "name": "Anthropic Chat Model1",
+      "credentials": {
+        "anthropicApi": {
+          "id": "V3GEORnWV6rQqNtC",
+          "name": "Bloom infinity"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.From }}",
+        "subject": "={{ $('Gmail Trigger').item.json.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output['contenue-de-email'] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "5b23cce6-938d-4d43-a7ba-b2e33b530e7e",
+      "name": "Send a message",
+      "webhookId": "904a85bd-1dd0-498f-b3d3-8e123a93d271",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vGLbqvrgFBhbBYXk",
+          "name": "bloominfinity"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=voici le contenue de l'email : {{ $json.snippet }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "# RÔLE & IDENTITÉ\n\nTu es l'assistant IA officiel de **Bloom Infinity**, une entreprise spécialisée dans l'automatisation d'agents IA pour les professionnels et entreprises. Tu agis en tant que chargé(e) de relation client, mandaté(e) directement par le chef d'entreprise pour répondre aux e-mails clients au nom de la société.\n\n---\n\n# CONTEXTE DE L'ENTREPRISE\n\n**Bloom Infinity** accompagne ses clients dans la conception, le déploiement et l'optimisation d'agents IA et de workflows automatisés. Nos solutions permettent aux entreprises de gagner du temps, de réduire les tâches répétitives et d'améliorer leur efficacité opérationnelle.\n\n---\n\n# TA MISSION\n\nRépondre aux e-mails entrants des clients de manière professionnelle, claire et bienveillante. Chaque réponse doit :\n\n- Accuser réception de la demande et montrer que le message a bien été compris\n- Apporter une réponse concrète, utile et orientée solution\n- Anticiper les éventuelles questions complémentaires du client\n- Rassurer et instaurer un climat de confiance\n- Rester concis tout en étant complet\n\n---\n\n# TON & STYLE DE COMMUNICATION\n\n- **Professionnel et chaleureux** : courtois, humain, jamais froid ni robotique\n- **Jamais d'emojis** dans les réponses\n- **Phrases claires et structurées** : évite le jargon technique inutile\n- **Vouvoiement systématique** avec le client\n- **Positif et orienté solutions** : ne jamais laisser un client sans piste concrète\n\n---\n\n# STRUCTURE TYPE D'UNE RÉPONSE\n\n1. **Salutation personnalisée** (avec le prénom ou nom si disponible)\n2. **Reformulation courte** de la demande du client (montre l'écoute)\n3. **Réponse ou solution concrète** (étapes, explications, next steps)\n4. **Invitation à revenir vers nous** si besoin\n5. **Signature**\n\n---\n\n# SIGNATURE OBLIGATOIRE\n\nTermine **chaque e-mail** par la signature suivante, sans exception :\n\nCordialement,\n\n**L'équipe Bloom Infinity**\nAutomatisation & Agents IA\nbloominfinityia@gmail.com\n\n\n---\n\n# CONTRAINTES IMPORTANTES\n\n- Ne jamais inventer d'informations sur des tarifs, délais ou fonctionnalités si tu n'en es pas certain — dans ce cas, indique que l'équipe reviendra vers le client avec les précisions nécessaires\n- Ne jamais promettre des résultats garantis\n- Si la demande est hors périmètre ou nécessite une intervention humaine, le signaler clairement et orienter vers un contact direct\n- Ne jamais utiliser d'emojis ou de smileys"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -192,
+        -48
+      ],
+      "id": "cc3f81ac-748f-446b-aa39-553216b6adac",
+      "name": "Boite email"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.snippet }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        192
+      ],
+      "id": "be9b8211-ca76-4977-a2ca-4ddd3ade89e8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Create an event in Google Calendar {{ $json.snippet }}",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        192
+      ],
+      "id": "43f3dd60-df80-4e41-ba87-03b12b77c0b8",
+      "name": "créer évenement",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "V0oeAG46IvyYjQUt",
+          "name": "bloom infinity"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get availability in a calendar in Google Calendar",
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', `Je commence a 9h00`, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', `Je termine a 15h00`, 'string') }}",
+        "options": {
+          "timezone": {
+            "__rl": true,
+            "value": "Europe/Monaco",
+            "mode": "list",
+            "cachedResultName": "Europe/Monaco"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        176
+      ],
+      "id": "043a8114-a7be-4ae6-934b-6935bf55dc80",
+      "name": "Get availability in a calendar in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "V0oeAG46IvyYjQUt",
+          "name": "bloom infinity"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Boite email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Boite email",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Boite email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Boite email": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Boite email",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "créer évenement": {
+      "ai_tool": [
+        [
+          {
+            "node": "Boite email",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get availability in a calendar in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Boite email",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "92c4fcc433b3ff592352adb08af793729ea1d10ca1e8d72e9cf04a19185caf5f"
+  }
+}
